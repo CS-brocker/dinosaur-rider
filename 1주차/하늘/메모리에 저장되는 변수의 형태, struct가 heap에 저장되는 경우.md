@@ -1,17 +1,16 @@
-## iOS에서는 어떻게 변수를 메모리에 저장할까?
+# iOS에서는 어떻게 변수를 메모리에 저장할까?
 
-![image.png](attachment:1c72ce18-666f-4a3b-827c-db8be5ea2ff7:image.png)
+<img width="300" alt="image" src="https://github.com/user-attachments/assets/55f2285b-ac9c-4071-a7fa-cd74f21720c1" />
 
-### <Stack>
 
+## [Stack]
 - LIFO. 잠깐 쌓아두고 버리는 공간
 - 컴파일 시점에 함수 호출시마다 Stack frame을 만들고 함수가 끝나면 메모리에서 해제됨 (OS가 자동으로 해제합니다)
 - 접근이 빠르고 메모리 크기가 작음
 - 값 타입이 저장됨 (Struct, Enum, Tuple)
 - 핵심 이슈: Stack overflow
 
-### <Heap>
-
+## [Heap]
 - 런타임에 필요한 공간만큼 요청해서 사용 (수동으로 **ARC**가 관리
     - ARC (Automatic Reference Counting)
         - Swift 컴파일러의 기능으로, 컴파일 타임에 적절히 retain, release를 넣어줌
@@ -19,31 +18,32 @@
 - 접근이 느리지만 메모리 크기가 stack에 비해 상대적으로 큼
 - 핵심 이슈: Memory Leak
 
-### ARC의 메모리 관리 방식과 memory leak 발생 과정
+## [ARC의 메모리 관리 방식과 memory leak 발생 과정]
 
-ARC는 모든 heap 객체마다 아래처럼 메타 데이터를 붙입니다. 
+ARC는 모든 heap 객체마다 아래처럼 메타 데이터를 붙임
 
-![image.png](attachment:337e8e34-d64c-43fc-b960-e153ba5d5c3a:15ffda6a-d6ec-49c6-844e-d7ae4e28dfd8.png)
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/0055277a-3cb4-4131-8516-eb0aa8b0d830" />
 
 - strong refCount: 정수 형태의 강한 참조 개수 (ex. 3)
 - weak reference table entry: weak 포인트 리스트 (ex. [pnt1, pnt2…])
 
-#### Memory leak 예시 (순환 참조)
+### Memory leak 예시 (순환 참조)
 
-![image.png](attachment:cb2a72cc-18e8-4050-934e-5764aa3c1fa2:image.png)
-
-#### Memory leak 발생하지 않는 예시 (weak)
-
-![image.png](attachment:12de6786-964f-42b9-af24-b06f55a26641:image.png)
+<img width="964" height="1005" alt="image" src="https://github.com/user-attachments/assets/8064a085-4621-4342-9ec0-58babda54470" />
 
 
+### Memory leak 발생하지 않는 예시 (weak)
 
-### Swift struct가 Heap으로 Escape하는 경우
+<img width="963" height="1007" alt="image" src="https://github.com/user-attachments/assets/bd89ee49-4ce2-45b5-b3f8-7b5575c58073" />
+
+
+
+## [Swift struct가 Heap으로 Escape하는 경우]
 - 보통 struct와 같은 값타입은 stack에 저장되지만 컴파일러가 struct를 stack에 둘 수 없다고 판단하면 heap으로 escape 시킴
 - 비동기적으로 실행되어 언제 실행될지 모르는데 stack에 있으면 함수가 종료되었을 때 메모리에서 해제되기 때문에 값을 안전하게 하기 위해 heap에 임의로 저장함
 
 
-#### 1. @escaping closure에서 캡처될 때
+### 1. @escaping closure에서 캡처될 때
 closure는 경우에 따라 함수가 종료된 후에도 실행될 수 있기 때문에, ARC는 안전을 위해 struct를 stack->heap으로 복사하고 클로저에서 heap에 있는 것을 참조시킴
 ```Swift
 struct User {
@@ -65,7 +65,7 @@ func test() {
 }
 ```
 
-#### 2. inout 매개변수로 전달될 때
+### 2. inout 매개변수로 전달될 때
 inout은 호출시 실제 메모리 주소를 참조하도록 하는 것인데, 함수 내부에서 그 변수를 비동기(async)로 접근하면
 함수가 끝난 뒤에도 그 메모리를 참조할 위험이 있음
 ARC는 heap 객체를 만들어서 참조 카운트를 올리는 방식으로 관리함 
@@ -84,7 +84,7 @@ func test() {
 }
 ```
 
-#### 3. Captured mutable struct
+### 3. Captured mutable struct
 c가 변경 가능한(mutating)상태로 클로저에 캡쳐되면 heap에 올려둬야 나중에 안전하게 closure를 실행할 수 있음
 ```
 struct Counter {
