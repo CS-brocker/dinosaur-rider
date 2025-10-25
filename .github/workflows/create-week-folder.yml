@@ -1,0 +1,46 @@
+name: Create Next Week Folder
+
+on:
+  workflow_dispatch:  # ✅ 수동 실행 전용 트리거
+
+jobs:
+  create-next-week:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Git push 허용
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Find latest week folder and create next one
+        run: |
+          # 1. 가장 큰 주차 폴더 번호 탐색
+          latest_week=$(ls -d *주차 2>/dev/null | grep -E '^[0-9]+주차$' | sed 's/주차//' | sort -n | tail -1)
+          if [ -z "$latest_week" ]; then
+            next_week=1
+          else
+            next_week=$((latest_week + 1))
+          fi
+
+          echo "➡️ Latest week: ${latest_week:-none}"
+          echo "➡️ Next week: ${next_week}주차"
+
+          # 2. 새 주차 폴더 생성
+          mkdir -p "${next_week}주차"
+
+          # 3. 팀원 폴더 및 샘플 파일 생성
+          for name in 창환 하늘 범철; do
+            mkdir -p "${next_week}주차/${name}"
+            echo "# ${name}의 ${next_week}주차 기록" > "${next_week}주차/${name}/sample.md"
+          done
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add .
+          git commit -m "✨ Add ${next_week}주차 directories with sample.md files" || echo "No changes to commit"
+          git push
