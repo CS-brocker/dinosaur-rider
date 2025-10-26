@@ -1,6 +1,6 @@
 # iOS에서는 어떻게 변수를 메모리에 저장할까?
 
-<img width="300" alt="image" src="https://github.com/user-attachments/assets/55f2285b-ac9c-4071-a7fa-cd74f21720c1" />
+<img width="300" alt="image" src="res/memory_structure.png" />
 
 
 ## [Stack]
@@ -22,20 +22,18 @@
 
 ARC는 모든 heap 객체마다 아래처럼 메타 데이터를 붙임
 
-<img width="800" alt="image" src="https://github.com/user-attachments/assets/0055277a-3cb4-4131-8516-eb0aa8b0d830" />
+<img width="800" alt="image" src="res/swift_heap_structure.png" />
 
 - strong refCount: 정수 형태의 강한 참조 개수 (ex. 3)
 - weak reference table entry: weak 포인트 리스트 (ex. [pnt1, pnt2…])
 
 ### Memory leak 예시 (순환 참조)
 
-<img width="964" height="1005" alt="image" src="https://github.com/user-attachments/assets/8064a085-4621-4342-9ec0-58babda54470" />
-
+<img width="964" height="1005" alt="image" src="res/memory_leak_in_swift.png" />
 
 ### Memory leak 발생하지 않는 예시 (weak)
 
-<img width="963" height="1007" alt="image" src="https://github.com/user-attachments/assets/bd89ee49-4ce2-45b5-b3f8-7b5575c58073" />
-
+<img width="963" height="1007" alt="image" src="res/memory_safety_in_swift" />
 
 
 ## [Swift struct가 Heap으로 Escape하는 경우]
