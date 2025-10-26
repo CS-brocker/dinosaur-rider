@@ -33,7 +33,7 @@ ARC는 모든 heap 객체마다 아래처럼 메타 데이터를 붙임
 
 ### Memory leak 발생하지 않는 예시 (weak)
 
-<img width="963" height="1007" alt="image" src="res/memory_safety_in_swift" />
+<img width="963" height="1007" alt="image" src="res/memory_safety_in_swift.png" />
 
 
 ## [Swift struct가 Heap으로 Escape하는 경우]
