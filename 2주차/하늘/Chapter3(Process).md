@@ -8,7 +8,7 @@
 
 ## 프로세스 상태
 
-<img width="300" alt="image" src="res/process2.png" />
+<img width="500" alt="image" src="res/process2.png" />
 
 <img width="300" alt="image" src="res/process3.png" />
 
@@ -25,7 +25,7 @@
     - I/O완료나 인터럽트. 자식 프로세스가 끝나기를 기다리는 동안 waiting queue로 들어갔다가 완료되면 ready queue로 이동하는 방식을 반복
 - 과거 프로세스 문맥을 PCB에 저장하고 새 프로세스의 문맥을 복구한다.
 
-<img width="300" alt="image" src="res/process4.png" />
+<img width="700" alt="image" src="res/process4.png" />
 
 iOS는 앱을 백그라운드에 오래 두면 webview process가 메모리에서 자동으로 날라감.. 앱 열었을 때 웹뷰 로드를 다시 해도 로컬스토리는 복구되지 않음
 
@@ -58,7 +58,7 @@ iOS는 앱을 백그라운드에 오래 두면 webview process가 메모리에�
 
 <img width="300" alt="image" src="res/process7.png" />
 
-<img width="300" alt="image" src="res/process8.png" />
+<img width="500" alt="image" src="res/process8.png" />
 
 POSIX: 유닉스(Darwin이나 Linux)의 API. 애플리케이션에서 시스템콜을 할 때 사용
 
@@ -79,14 +79,14 @@ POSIX: 유닉스(Darwin이나 Linux)의 API. 애플리케이션에서 시스템�
 - 스텁(stub): RPC를 가능하게 해주는 대리자. 클라이언트 스텁, 서버 스텁이 있어서 네트워크 통신을 대신해줌
 - XDR (External Data Representation): 모든 기종이 이해할 수 있는 표준 데이터 표현 방식
 
-<img width="300" alt="image" src="res/process9.png" />
+<img width="700" alt="image" src="res/process9.png" />
 
 
 송신 측은 XDR 형식으로 변환해서 보내고, 수신 측은 해석해서 자기 CPU가 이해할 수 있는 방식으로 바꾼다.
 
 - 실행 의미(semantics): 네트워크 오류나 중복 때문에 여러 번 실행될 수 있는 상황을 규제할 방식을 미리 정해놓고 OS가 이를 보장해줌
     
-    <img width="300" alt="image" src="res/process10.png" />
+    <img width="500" alt="image" src="res/process10.png" />
     
     예시
     
