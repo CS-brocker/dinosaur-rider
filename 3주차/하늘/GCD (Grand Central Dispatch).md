@@ -52,7 +52,8 @@ func asyncFucntion() { // sync는 기다리기 때문에 a, b, c의 순차 출�
 
 ### QoS (Quality Of Service)
 
-![image.png](attachment:9152a3a8-e46b-46ad-947f-26546addb403:image.png)
+<img width="500" alt="image" src="res/QoS.png" />
+
 
 ```swift
 DispatchQueue.global(qos: .background).async {
