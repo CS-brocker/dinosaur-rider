@@ -20,7 +20,7 @@ OS 페이지 테이블 : OS가 각 프로세스마다 따로 가지고 있는 �
 
 ### 커널 <-> 사용자 프로그램 간 cpu 제어권 전환시
 
-이 경우 “프로세스는 바뀌지 않는다”.
+이 경우 “프로세스는 바뀌지 않는다”.  
 TLB Flush(비우기) 하지 않는다.
 
 이유: 같은 프로세스가 사용하는 page table이 동일
@@ -35,23 +35,23 @@ TLB Flush(비우기) 하지 않는다.
 
 ### 최적화 관점 항상 Flush를 하지는 않음 ASID(Address Space ID)
 
-ARM, x86 등 최신 CPU는 다음 기능을 가짐:
+ARM, x86 등 최신 CPU는 다음 기능을 가짐:  
 
-→ ASID(또는 PCID: Process Context ID)
+→ ASID(또는 PCID: Process Context ID). 
 
-TLB 엔트리마다 프로세스 ID를 태깅해서
-다른 프로세스의 TLB 엔트리를 자동으로 무시할 수 있게 됨.
+TLB 엔트리마다 프로세스 ID를 태깅해서. 
+다른 프로세스의 TLB 엔트리를 자동으로 무시할 수 있게 됨.  
 
-컨텍스트 스위칭 때 TLB를 완전히 비우지 않아도 된다
-OS는 CR3(context register) 변경 시 “PCID가 다르면 TLB 자동 분리” 기능을 사용
+컨텍스트 스위칭 때 TLB를 완전히 비우지 않아도 된다. 
+OS는 CR3(context register) 변경 시 “PCID가 다르면 TLB 자동 분리” 기능을 사용. 
 
 
-👍 성능 매우 큰 이득 (TLB miss 비용이 엄청 크기 때문)
+👍 성능 매우 큰 이득 (TLB miss 비용이 엄청 크기 때문). 
 
 ### TLB Flush 가 왜비싼가?
 
-TLB miss 1번 =
-페이지 테이블 두세 단계 메모리 접근 → 캐시 미스 죽음 → 성능 엄청 느려짐
+TLB miss 1번 =  
+페이지 테이블 두세 단계 메모리 접근 → 캐시 미스 죽음 → 성능 엄청 느려짐. 
 
 이에 대한 최적화
 - 리눅스 스케줄러는 보통 같은 CPU에 동일 프로세스를 계속 스케줄링하려고 함 (cache affinity)
