@@ -55,7 +55,7 @@ ready 상태에서 cpu점유권을 주는 행위를(스케쥴러가) dispatch라
 - accounting information
 - I/O status information
 
-이중 register 관련 값들을 context라고 지칭한다.
+이중 register 관련 값들을 context라고 지칭한다.  
 -> 실행 프로세스가 변경될떄 변경되어야하는 사항들
  
 
@@ -90,7 +90,7 @@ ready Queue, IO Queue 이런 이야기가 나오는데 반효경 교수님 강�
 걍 흘러가듯이 듣고 나중에는 [예전 글](https://mccoy-devloper.tistory.com/78) 이걸 참고해야겠다.
 
 ## 컨텍스트 스위칭
-알던 이야기 쭈르륵 늘어놓는다.
+알던 이야기 쭈르륵 늘어놓는다.  
 PCB 교환 이야기
 
 ## 프로세스 생성
@@ -106,7 +106,7 @@ PCB 교환 이야기
   - 새로운 프로그램을 메모리에 로드
 
 ## 프로세스 종료
-그냥 마지막 명령어 끝나면 종료이고
+그냥 마지막 명령어 끝나면 종료이고   
 중간에 exit() 시스템 콜 호출해서 끝낼수있다. -> 코틀린에서는 exitProcess() 함수 / Java의 System.exit()호출해도됨
 
 ## 프로세스 종류(좀비와 고아)
