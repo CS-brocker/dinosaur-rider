@@ -4,6 +4,8 @@
 # 2. 파일명이 변경되면 기존 파일명이 PigLibrary에 그대로 남고 새 파일명이 추가됩니다.
 #    이 경우 PigLibrary에서 기존 파일을 수동으로 삭제해야 합니다.
 # 3. res/ 이미지는 없는 파일만 추가되며 덮어쓰지 않습니다.
+# 4. 1~7장은 동기화 대상에서 제외됩니다. PigLibrary의 해당 장이 원본 기준이므로
+#    dinosaur-rider에서 수정해도 PigLibrary로 반영되지 않습니다.
 # =====================================================
 name: Sync 창환 Study Files to PigLibrary
 
@@ -46,6 +48,13 @@ jobs:
             if [ -z "$chapter" ]; then
               echo "::error::🚨 ${week_dir}/창환/ 폴더에 n장 파일이 없습니다. ($file 처리 중) 🚨"
               exit 1
+            fi
+
+            # 1~7장은 PigLibrary가 원본 기준이므로 동기화 제외
+            chapter_num=$(echo "$chapter" | grep -oE '^[0-9]+')
+            if [ "$chapter_num" -le 7 ]; then
+              echo "Skipped (1~7장 제외): $file"
+              continue
             fi
 
             echo "${chapter}|${file}" >> /tmp/chapter_files.txt
