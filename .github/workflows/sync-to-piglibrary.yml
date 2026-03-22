@@ -77,6 +77,7 @@ jobs:
           done < /tmp/chapter_files.txt
 
       - name: Commit and push to PigLibrary
+        id: commit
         if: steps.find.outputs.has_files == 'true'
         env:
           PAT: ${{ secrets.CHANG_HWAN_PAT }}
@@ -88,9 +89,47 @@ jobs:
 
           git add .
           if git diff --staged --quiet; then
-            echo "변경사항 없음, 스킵"
+            echo "no_changes=true" >> $GITHUB_OUTPUT
           else
             chapters=$(cut -d'|' -f1 /tmp/chapter_files.txt | sort -u | tr '\n' ' ' | sed 's/ $//')
             git commit -m "📚 Sync study notes from dinosaur-rider (${chapters})"
             git push
+            echo "no_changes=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "=============================="
+          echo "         동기화 결과 요약"
+          echo "=============================="
+
+          if [ "${{ steps.find.outcome }}" = "failure" ]; then
+            echo "❌ 실패: n장 파일을 찾지 못했습니다."
+            echo "   원인: 변경된 파일이 속한 주차 폴더에 n장으로 시작하는 파일이 없습니다."
+            exit 0
+          fi
+
+          if [ "${{ steps.find.outputs.has_files }}" = "false" ]; then
+            echo "ℹ️ 생략: 동기화할 파일이 없습니다."
+            echo "   원인: n주차/창환/ 하위에 변경된 .md 파일이 없습니다."
+            exit 0
+          fi
+
+          echo ""
+          echo "📋 복사된 파일 목록:"
+          while IFS= read -r line; do
+            chapter=$(echo "$line" | cut -d'|' -f1)
+            file=$(echo "$line" | cut -d'|' -f2)
+            filename=$(basename "$file")
+            echo "  ✅ $filename → 운영체제(공룡책)/${chapter}/${filename}"
+          done < /tmp/chapter_files.txt
+
+          echo ""
+          if [ "${{ steps.commit.outputs.no_changes }}" = "true" ]; then
+            echo "ℹ️ 생략: PigLibrary에 이미 동일한 내용이 존재합니다. push 생략."
+          else
+            chapters=$(cut -d'|' -f1 /tmp/chapter_files.txt | sort -u | tr '\n' ' ' | sed 's/ $//')
+            echo "🚀 완료: PigLibrary에 push 성공 (${chapters})"
+          fi
+          echo "=============================="
