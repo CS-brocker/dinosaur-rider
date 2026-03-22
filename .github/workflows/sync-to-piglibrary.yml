@@ -19,9 +19,9 @@ jobs:
       - name: Find changed files and resolve chapter
         id: find
         run: |
-          # 변경된 파일 중 n주차/창환/ 하위 .md 파일 추출
+          # 변경된 파일 중 n주차/창환/ 하위 .md 및 res/ 이미지 추출
           git -c core.quotepath=false diff --name-only HEAD~1 HEAD \
-            | grep -E '^[0-9]+주차/창환/.*\.md$' \
+            | grep -E '^[0-9]+주차/창환/(.*\.md|res/.+)$' \
             > /tmp/changed_files.txt || true
 
           echo "=== Changed files ==="
@@ -71,9 +71,21 @@ jobs:
             filename=$(basename "$file")
 
             dest_dir="/tmp/piglibrary/운영체제(공룡책)/${chapter}"
-            mkdir -p "$dest_dir"
-            cp "$file" "$dest_dir/$filename"
-            echo "Copied: $file -> $dest_dir/$filename"
+
+            if echo "$file" | grep -q '/res/'; then
+              mkdir -p "$dest_dir/res"
+              if [ ! -f "$dest_dir/res/$filename" ]; then
+                cp "$file" "$dest_dir/res/$filename"
+                echo "Added: $file -> 운영체제(공룡책)/${chapter}/res/${filename}"
+              else
+                echo "Skipped (already exists): 운영체제(공룡책)/${chapter}/res/${filename}"
+              fi
+            else
+              # .md 파일 - 덮어쓰기
+              mkdir -p "$dest_dir"
+              cp "$file" "$dest_dir/$filename"
+              echo "Copied: $file -> 운영체제(공룡책)/${chapter}/${filename}"
+            fi
           done < /tmp/chapter_files.txt
 
       - name: Commit and push to PigLibrary
@@ -112,7 +124,7 @@ jobs:
 
           if [ "${{ steps.find.outputs.has_files }}" = "false" ]; then
             echo "ℹ️ 생략: 동기화할 파일이 없습니다."
-            echo "   원인: n주차/창환/ 하위에 변경된 .md 파일이 없습니다."
+            echo "   원인: n주차/창환/ 하위에 변경된 .md 또는 res/ 파일이 없습니다."
             exit 0
           fi
 
