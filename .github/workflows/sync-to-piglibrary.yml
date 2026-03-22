@@ -1,0 +1,96 @@
+name: Sync 창환 Study Files to PigLibrary
+
+on:
+  push:
+    paths:
+      - '*주차/창환/**'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    if: github.actor == '2chang5' || github.actor == 'android-changhwan'
+
+    steps:
+      - name: Checkout dinosaur-rider
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Find changed files and resolve chapter
+        id: find
+        run: |
+          # 변경된 파일 중 n주차/창환/ 하위 .md 파일 추출
+          git diff --name-only HEAD~1 HEAD \
+            | grep -E '^[0-9]+주차/창환/.*\.md$' \
+            > /tmp/changed_files.txt || true
+
+          echo "=== Changed files ==="
+          cat /tmp/changed_files.txt
+
+          # 변경된 파일이 속한 주차별로 장 정보를 매핑
+          # 형식: "n장|파일경로"
+          > /tmp/chapter_files.txt
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+
+            week_dir=$(echo "$file" | grep -oE '^[0-9]+주차')
+            chapter=$(ls "${week_dir}/창환/" | grep -oE '^[0-9]+장' | head -1)
+
+            if [ -z "$chapter" ]; then
+              echo "::error::🚨 ${week_dir}/창환/ 폴더에 n장 파일이 없습니다. ($file 처리 중) 🚨"
+              exit 1
+            fi
+
+            echo "${chapter}|${file}" >> /tmp/chapter_files.txt
+          done < /tmp/changed_files.txt
+
+          echo "=== Chapter mapping ==="
+          cat /tmp/chapter_files.txt
+
+          if [ -s /tmp/chapter_files.txt ]; then
+            echo "has_files=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_files=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Clone PigLibrary
+        if: steps.find.outputs.has_files == 'true'
+        env:
+          PAT: ${{ secrets.CHANG_HWAN_PAT }}
+        run: |
+          git clone https://x-access-token:${PAT}@github.com/Exodia-Pig/PigLibrary.git /tmp/piglibrary
+
+      - name: Copy files to PigLibrary
+        if: steps.find.outputs.has_files == 'true'
+        run: |
+          while IFS= read -r line; do
+            [ -z "$line" ] && continue
+
+            chapter=$(echo "$line" | cut -d'|' -f1)
+            file=$(echo "$line" | cut -d'|' -f2)
+            filename=$(basename "$file")
+
+            dest_dir="/tmp/piglibrary/운영체제(공룡책)/${chapter}"
+            mkdir -p "$dest_dir"
+            cp "$file" "$dest_dir/$filename"
+            echo "Copied: $file -> $dest_dir/$filename"
+          done < /tmp/chapter_files.txt
+
+      - name: Commit and push to PigLibrary
+        if: steps.find.outputs.has_files == 'true'
+        env:
+          PAT: ${{ secrets.CHANG_HWAN_PAT }}
+        run: |
+          cd /tmp/piglibrary
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add .
+          if git diff --staged --quiet; then
+            echo "변경사항 없음, 스킵"
+          else
+            chapters=$(cut -d'|' -f1 /tmp/chapter_files.txt | sort -u | tr '\n' ' ' | sed 's/ $//')
+            git commit -m "📚 Sync study notes from dinosaur-rider (${chapters})"
+            git push
+          fi
